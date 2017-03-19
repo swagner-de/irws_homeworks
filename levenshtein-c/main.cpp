@@ -8,6 +8,8 @@
 using namespace std;
 using json = nlohmann::json;
 
+json weight_map = NULL;
+bool weighted = false;
 
 long minimum(long left, long right){
     if (left<right) return left;
@@ -33,97 +35,60 @@ long maximum(long left, long right){
     else return right;
 }
 
-double damerau_levenshtein(string* left, string* right, unsigned long l_final_char_idx, unsigned long r_final_char_idx){
-
-    if (minimum(l_final_char_idx, r_final_char_idx) == 0){
-        return maximum(l_final_char_idx, r_final_char_idx);
-    }
-
-
-    vector<double> vals;
-
-    if (( l_final_char_idx > 1 and  r_final_char_idx > 1) and
-            (left->at(l_final_char_idx) == right->at(r_final_char_idx - 1)) and
-            (left->at(l_final_char_idx -1 ) == right->at(r_final_char_idx))) {
-
-
-        vals.push_back(damerau_levenshtein(left, right, l_final_char_idx -1 , r_final_char_idx) + 1);
-        vals.push_back(damerau_levenshtein(left, right, l_final_char_idx, r_final_char_idx - 1) + 1);
-        if (left->at(l_final_char_idx) == right->at(r_final_char_idx)) {
-            vals.push_back(damerau_levenshtein(left, right , l_final_char_idx - 1, r_final_char_idx - 1));
-        }
-        else{
-            vals.push_back(damerau_levenshtein(left, right , l_final_char_idx - 1, r_final_char_idx - 1) + 1);
-        }
-        vals.push_back(damerau_levenshtein(left, right , l_final_char_idx - 2, r_final_char_idx - 2) + 1);
-        return minimum(&vals);
-    }
-    else{
-        vals.push_back(damerau_levenshtein(left, right, l_final_char_idx - 1, r_final_char_idx) + 1);
-        vals.push_back(damerau_levenshtein(left, right, l_final_char_idx, r_final_char_idx - 1) + 1);
-        if (left->at(l_final_char_idx) == right->at(r_final_char_idx)) {
-            vals.push_back(damerau_levenshtein(left, right, l_final_char_idx - 1, r_final_char_idx - 1));
-        }
-        else {
-            vals.push_back(damerau_levenshtein(left, right, l_final_char_idx - 1, r_final_char_idx - 1) + 1);
-
-        }
-        return minimum(&vals);
-    }
-}
-
 json load_weights(string path){
     std::ifstream weights_file(path);
-    json weight_map;
     weights_file >> weight_map;
-    return weight_map;
 }
 
-double calc_weight(json* weight_map, string a, string b){
+double calc_weight(char ch_a, char ch_b){
+    string a, b;
+    a = string(1, ch_a);
+    b = string(1, ch_b);
     if (a == b) return 0.0;
+    if (!weighted) return 1.0;
     try{
-        return weight_map->operator[](a+b);
+        return weight_map[a+b];
     }
-    catch(domain_error e){
-        try{
-            return weight_map->operator[](b+a);
+    catch (domain_error) {
+        try {
+            return weight_map[b + a];
         }
-        catch(domain_error e){
+        catch (domain_error){
             return 1.0;
         }
     }
 }
 
-double damerau_levenshtein_weighted(json* weight_map, string* left, string* right, double l_final_char_idx, double r_final_char_idx){
+double damerau_levenshtein(string* left, string* right, unsigned long l_len, unsigned long r_len){
 
-    if (minimum(l_final_char_idx, r_final_char_idx) == 0){
-        return maximum(l_final_char_idx, r_final_char_idx);
+    if (minimum(l_len, r_len) == 0){
+        return maximum(l_len, r_len);
     }
+
+    unsigned long r_final_char_idx = r_len - 1;
+    unsigned long l_final_char_idx = l_len - 1;
+
+    double weight = calc_weight(left->at(l_final_char_idx), right->at(r_final_char_idx));
+
 
 
     vector<double> vals;
 
-    if (( l_final_char_idx > 1 and  r_final_char_idx > 1) and
+    if (( l_len > 1 and  r_len > 1) and
         (left->at(l_final_char_idx) == right->at(r_final_char_idx - 1)) and
         (left->at(l_final_char_idx -1 ) == right->at(r_final_char_idx))) {
 
 
-        vals.push_back(damerau_levenshtein(left, right, l_final_char_idx -1 , r_final_char_idx) + 1);
-        vals.push_back(damerau_levenshtein(left, right, l_final_char_idx, r_final_char_idx - 1) + 1);
-        vals.push_back(damerau_levenshtein(left, right , l_final_char_idx - 1, r_final_char_idx - 1) + calc_weight());
-        vals.push_back(damerau_levenshtein(left, right , l_final_char_idx - 2, r_final_char_idx - 2) + 1);
+        vals.push_back(damerau_levenshtein(left, right, l_len -1 , r_len) + weight);
+        vals.push_back(damerau_levenshtein(left, right, l_len, r_len - 1) + weight);
+        vals.push_back(damerau_levenshtein(left, right , l_len - 1, r_len - 1) + weight);
+        vals.push_back(damerau_levenshtein(left, right , l_len - 2, r_len - 2) + weight);
         return minimum(&vals);
     }
     else{
-        vals.push_back(damerau_levenshtein(left, right, l_final_char_idx - 1, r_final_char_idx) + 1);
-        vals.push_back(damerau_levenshtein(left, right, l_final_char_idx, r_final_char_idx - 1) + 1);
-        if (left->at(l_final_char_idx) == right->at(r_final_char_idx)) {
-            vals.push_back(damerau_levenshtein(left, right, l_final_char_idx - 1, r_final_char_idx - 1));
-        }
-        else {
-            vals.push_back(damerau_levenshtein(left, right, l_final_char_idx - 1, r_final_char_idx - 1) + 1);
-
-        }
+        vals.push_back(damerau_levenshtein(left, right, l_len - 1, r_len) + weight);
+        vals.push_back(damerau_levenshtein(left, right, l_len, r_len - 1) + weight);
+        vals.push_back(damerau_levenshtein(left, right, l_len - 1, r_len - 1) + weight);
         return minimum(&vals);
     }
 }
@@ -138,6 +103,7 @@ int main(int argc, char* argv[]) {
         right = string(argv[3]);
 
         if (mode.compare("weighted") == 0){
+            weighted = true;
             string weightsfile;
             if (argc == 5){
                 weightsfile = string(argv[4]);
@@ -146,12 +112,13 @@ int main(int argc, char* argv[]) {
                 cout<<"Missing weightsfile" <<endl;
                 return -1;
             }
-            json weight_map = load_weights(weightsfile);
-            double dist = damerau_levenshtein_weighted(&weight_map, &left, &right, left.length() - 1, right.length() - 1);
+            load_weights(weightsfile);
+            double dist = damerau_levenshtein(&left, &right, left.length(), right.length());
             cout << "The weighted damerau levenshtein distance between " + left + " and " + right + " is " + to_string(dist) <<endl;
+            return 0;
         }
         else if(mode.compare("unweighted") == 0){
-            int dist = damerau_levenshtein(&left, &right, left.length() - 1, right.length() - 1);
+            int dist = damerau_levenshtein(&left, &right, left.length(), right.length());
             cout << "The damerau levenshtein distance between " + left + " and " + right + " is " + to_string(dist) <<endl;
             return 0;
         }
