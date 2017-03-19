@@ -1,0 +1,121 @@
+{
+    "'aboration$coll' - 'boration$colla'": {
+        "'$condition' - '$youngster'": [
+            "$condition",
+            "$consideration",
+            "$youngster"
+        ],
+        "'aboration$coll' - 'animal$'": [
+            "aboration$coll",
+            "al$anim",
+            "animal$"
+        ],
+        "'ation$collabor' - 'boration$colla'": [
+            "ation$collabor",
+            "ation$consider",
+            "boration$colla"
+        ]
+    },
+    "'er$youngst' - 'ster$young'": {
+        "'er$youngst' - 'gster$youn'": [
+            "er$youngst",
+            "eration$consid",
+            "gster$youn"
+        ],
+        "'nimal$a' - 'ollaboration$c'": [
+            "nimal$a",
+            "nsideration$co",
+            "ollaboration$c"
+        ],
+        "'ration$conside' - 'ster$young'": [
+            "ration$conside",
+            "sideration$con",
+            "ster$young"
+        ]
+    },
+    "'ideration$cons' - 'condition$'": {
+        "'collaboration$' - 'condition$'": [
+            "collaboration$",
+            "comotion$",
+            "condition$"
+        ],
+        "'ideration$cons' - 'ion$collaborat'": [
+            "ideration$cons",
+            "imal$an",
+            "ion$collaborat"
+        ],
+        "'omotion$c' - 'on$comoti'": [
+            "omotion$c",
+            "on$collaborati",
+            "on$comoti"
+        ]
+    },
+    "'ition$cond' - 'tion$como'": {
+        "'$animal' - '$comotion'": [
+            "$animal",
+            "$collaboration",
+            "$comotion"
+        ],
+        "'ition$cond' - 'laboration$col'": [
+            "ition$cond",
+            "l$anima",
+            "laboration$col"
+        ],
+        "'ter$youngs' - 'tion$como'": [
+            "ter$youngs",
+            "tion$collabora",
+            "tion$como"
+        ]
+    },
+    "'n$consideratio' - 'ion$considerat'": {
+        "'ion$comot' - 'ion$considerat'": [
+            "ion$comot",
+            "ion$condit",
+            "ion$considerat"
+        ],
+        "'n$collaboratio' - 'n$conditio'": [
+            "n$collaboratio",
+            "n$comotio",
+            "n$conditio"
+        ],
+        "'n$consideratio' - 'ngster$you'": [
+            "n$consideratio",
+            "ndition$co",
+            "ngster$you"
+        ]
+    },
+    "'on$conditi' - 'ungster$yo'": {
+        "'on$conditi' - 'ondition$c'": [
+            "on$conditi",
+            "on$considerati",
+            "ondition$c"
+        ],
+        "'onsideration$c' - 'otion$com'": [
+            "onsideration$c",
+            "oration$collab",
+            "otion$com"
+        ],
+        "'tion$condi' - 'ungster$yo'": [
+            "tion$condi",
+            "tion$considera",
+            "ungster$yo"
+        ]
+    },
+    "'oungster$y' - 'dition$con'": {
+        "'consideration$' - 'dition$con'": [
+            "consideration$",
+            "deration$consi",
+            "dition$con"
+        ],
+        "'llaboration$co' - 'motion$co'": [
+            "llaboration$co",
+            "mal$ani",
+            "motion$co"
+        ],
+        "'oungster$y' - 'ration$collabo'": [
+            "oungster$y",
+            "r$youngste",
+            "ration$collabo"
+        ]
+    }
+}
