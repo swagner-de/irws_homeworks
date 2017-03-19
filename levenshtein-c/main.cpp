@@ -9,8 +9,8 @@ long minimum(long left, long right){
 
 }
 
-int minimum(vector<long>* nmbrs){
-    long  min;
+double minimum(vector<double>* nmbrs){
+    double  min = NULL;
     for ( auto &i : *nmbrs ){
         if(min == NULL or i < min){
             min = i;
@@ -22,19 +22,19 @@ int minimum(vector<long>* nmbrs){
     return min;
 }
 
-int maximum(long left, long right){
+long maximum(long left, long right){
     if (left>right) return left;
     else return right;
 }
 
-long damerau_levenshtein(string* left, string* right, long l_final_char_idx, long r_final_char_idx){
+double damerau_levenshtein(string* left, string* right, long l_final_char_idx, long r_final_char_idx){
 
     if (minimum(l_final_char_idx, r_final_char_idx) == 0){
         return maximum(l_final_char_idx, r_final_char_idx);
     }
 
 
-    vector<long> vals;
+    vector<double> vals;
 
     if (( l_final_char_idx > 1 and  r_final_char_idx > 1) and
             (left->at(l_final_char_idx) == right->at(r_final_char_idx - 1)) and
@@ -66,19 +66,34 @@ long damerau_levenshtein(string* left, string* right, long l_final_char_idx, lon
     }
 }
 
+double damerau_levenshtein_weighted(string* left, string* right, double l_final_char_idx, double r_final_char_idx){
+    
+}
+
 
 int main(int argc, char* argv[]) {
 
-    if (argc == 3) {
-        string left, right;
-        left = string(argv[1]);
-        right = string(argv[2]);
+    if (argc == 4) {
+        string mode, left, right;
+        mode = string(argv[1]);
+        left = string(argv[2]);
+        right = string(argv[3]);
 
-        int dist = damerau_levenshtein(&left, &right, left.length() - 1, right.length() - 1);
-        cout << "The damerau levenshtein distance between " + left + " and " + right + " is " + to_string(dist) <<endl;
+        if (mode.compare("weighted") == 0){
+            double dist = damerau_levenshtein_weighted(&left, &right, left.length() - 1, right.length() - 1);
+        }
+        else if(mode.compare("unweighted") == 0){
+            int dist = damerau_levenshtein(&left, &right, left.length() - 1, right.length() - 1);
+            cout << "The damerau levenshtein distance between " + left + " and " + right + " is " + to_string(dist) <<endl;
+            return 0;
+        }
+        else{
+            cout << "Given mode must be one of [weighted|unweighted]"<<endl;
+            return -1;
+        }
         return 0;
     } else {
-        cout << "Only accepting two arguments" << endl;
+        cout << "Call must be \"./levenshtein-c [weighted|unweighted] string1 string2\"" << endl;
         return -1;
     }
 }
