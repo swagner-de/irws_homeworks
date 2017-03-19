@@ -27,41 +27,39 @@ int maximum(long left, long right){
     else return right;
 }
 
-long damerau_levenshtein(string* left, string* right, long l_len, long r_len){
+long damerau_levenshtein(string* left, string* right, long l_final_char_idx, long r_final_char_idx){
 
-
-    if (minimum(r_len, l_len) == 0){
-        return maximum(l_len, r_len);
+    if (minimum(l_final_char_idx, r_final_char_idx) == 0){
+        return maximum(l_final_char_idx, r_final_char_idx);
     }
+
 
     vector<long> vals;
 
-    if ((l_len > 1 and r_len > 1) and
-            (left->at(l_len-1) == right->at(r_len-2)) and
-            (left->at(l_len-2) == right->at(r_len-1))) {
+    if (( l_final_char_idx > 1 and  r_final_char_idx > 1) and
+            (left->at(l_final_char_idx) == right->at(r_final_char_idx - 1)) and
+            (left->at(l_final_char_idx -1 ) == right->at(r_final_char_idx))) {
 
 
-        vals.push_back(damerau_levenshtein(left, right, l_len - 1, r_len) + 1);
-        vals.push_back(damerau_levenshtein(left, right, l_len, r_len - 1) + 1);
-        if (left->at(l_len-1) == right->at(r_len-1)) {
-            vals.push_back(damerau_levenshtein(left, right , l_len - 1, r_len - 1));
+        vals.push_back(damerau_levenshtein(left, right, l_final_char_idx -1 , r_final_char_idx) + 1);
+        vals.push_back(damerau_levenshtein(left, right, l_final_char_idx, r_final_char_idx - 1) + 1);
+        if (left->at(l_final_char_idx) == right->at(r_final_char_idx)) {
+            vals.push_back(damerau_levenshtein(left, right , l_final_char_idx - 1, r_final_char_idx - 1));
         }
         else{
-                vals.push_back(damerau_levenshtein(left, right , l_len - 1, r_len - 1) + 1);
-
-            }
-        vals.push_back(damerau_levenshtein(left, right , l_len - 2, r_len - 2) + 1);
+            vals.push_back(damerau_levenshtein(left, right , l_final_char_idx - 1, r_final_char_idx - 1) + 1);
+        }
+        vals.push_back(damerau_levenshtein(left, right , l_final_char_idx - 2, r_final_char_idx - 2) + 1);
         return minimum(&vals);
     }
-
     else{
-        vals.push_back(damerau_levenshtein(left, right, l_len - 1, r_len) + 1);
-        vals.push_back(damerau_levenshtein(left, right, l_len, r_len - 1) + 1);
-        if (left->at(l_len-1) == right->at(r_len-1)) {
-            vals.push_back(damerau_levenshtein(left, right, l_len, r_len - 1));
+        vals.push_back(damerau_levenshtein(left, right, l_final_char_idx - 1, r_final_char_idx) + 1);
+        vals.push_back(damerau_levenshtein(left, right, l_final_char_idx, r_final_char_idx - 1) + 1);
+        if (left->at(l_final_char_idx) == right->at(r_final_char_idx)) {
+            vals.push_back(damerau_levenshtein(left, right, l_final_char_idx - 1, r_final_char_idx - 1));
         }
         else {
-            vals.push_back(damerau_levenshtein(left, right, l_len - 1, r_len - 1) + 1);
+            vals.push_back(damerau_levenshtein(left, right, l_final_char_idx - 1, r_final_char_idx - 1) + 1);
 
         }
         return minimum(&vals);
@@ -76,7 +74,7 @@ int main(int argc, char* argv[]) {
         left = string(argv[1]);
         right = string(argv[2]);
 
-        int dist = damerau_levenshtein(&left, &right, left.length(), right.length());
+        int dist = damerau_levenshtein(&left, &right, left.length() - 1, right.length() - 1);
         cout << "The damerau levenshtein distance between " + left + " and " + right + " is " + to_string(dist) <<endl;
         return 0;
     } else {
