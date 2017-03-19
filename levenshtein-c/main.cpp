@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <limits>
+
 
 using namespace std;
 
@@ -10,9 +12,9 @@ long minimum(long left, long right){
 }
 
 double minimum(vector<double>* nmbrs){
-    double  min = NULL;
+    double  min = numeric_limits<double>::max();
     for ( auto &i : *nmbrs ){
-        if(min == NULL or i < min){
+        if(i < min){
             min = i;
         }
         if (min == 0) {
@@ -27,7 +29,7 @@ long maximum(long left, long right){
     else return right;
 }
 
-double damerau_levenshtein(string* left, string* right, long l_final_char_idx, long r_final_char_idx){
+double damerau_levenshtein(string* left, string* right, unsigned long l_final_char_idx, unsigned long r_final_char_idx){
 
     if (minimum(l_final_char_idx, r_final_char_idx) == 0){
         return maximum(l_final_char_idx, r_final_char_idx);
