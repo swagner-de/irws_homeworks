@@ -2,26 +2,43 @@
 
 import nltk
 from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet
 from pprint import pprint
+
+lemmatizer = WordNetLemmatizer()
+
 
 d1 = "Frodo and Sam were trembling in the darkness, surrounded in darkness by hundreds of blood-thirsty orcs. Sam was certain these beasts were about to taste the scent of their flesh."
 d2 = "The faceless black beast then stabbed Frodo. He felt like every nerve in his body was hurting. Suddenly, he thought of Sam and his calming smile. Frodo had betrayed him."
 d3 = "Frodo’s sword was radiating blue, stronger and stronger every second. Orcs were getting closer. And these weren’t just regular orcs either, Uruk-Hai were among them. Frodo had killed regular orcs before, but he had never stabbed an Uruk-Hai, not wit the blue stick."
 d4 = "Sam was carrying a small lamp, shedding some blue light. He was afraid that orcs might spot him, but it was the only way to avoid deadly pitfalls of Mordor."
 
+
 blacklist = [
 
 ]
 
+# stolen from http://stackoverflow.com/questions/15586721/wordnet-lemmatization-and-pos-tagging-in-python
+def get_wordnet_pos(treebank_tag):
+    if treebank_tag.startswith('J'):
+        return wordnet.ADJ
+    elif treebank_tag.startswith('V'):
+        return wordnet.VERB
+    elif treebank_tag.startswith('N'):
+        return wordnet.NOUN
+    elif treebank_tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return ''
 
 
 def filter_nouns_adjectives(tokens):
     tagged = nltk.pos_tag(tokens)
-    return [t[0] for t in tagged if (t[1][:1] == 'J' or t[1][:1] == 'N') and t[0] not in blacklist]
+    return [t for t in tagged if (t[1][:1] == 'J' or t[1][:1] == 'N') and t[0] not in blacklist]
+
 
 def lemmatize(tokens):
-    l = WordNetLemmatizer()
-    return [l.lemmatize(t) for t in tokens]
+    return [lemmatizer.lemmatize(t[0], get_wordnet_pos(t[1])) for t in tokens]
 
 def build_idf_map(docs):
     all_terms = set()
@@ -55,8 +72,8 @@ def preprocess(docs):
     res = []
     for d in docs:
         tokens = nltk.word_tokenize(d)
-        filtered = filter_nouns_adjectives(tokens)
-        lemmatized = lemmatize(filtered)
+        filtered_and_tagged = filter_nouns_adjectives(tokens)
+        lemmatized = lemmatize(filtered_and_tagged)
         res.append(lemmatized)
     return res
 
