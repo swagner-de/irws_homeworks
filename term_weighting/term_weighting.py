@@ -10,7 +10,7 @@ lemmatizer = WordNetLemmatizer()
 
 d1 = "Frodo and Sam were trembling in the darkness, surrounded in darkness by hundreds of blood-thirsty orcs. Sam was certain these beasts were about to taste the scent of their flesh."
 d2 = "The faceless black beast then stabbed Frodo. He felt like every nerve in his body was hurting. Suddenly, he thought of Sam and his calming smile. Frodo had betrayed him."
-d3 = "Frodo’s sword was radiating blue, stronger and stronger every second. Orcs were getting closer. And these weren’t just regular orcs either, Uruk-Hai were among them. Frodo had killed regular orcs before, but he had never stabbed an Uruk-Hai, not wit the blue stick."
+d3 = "Frodo's sword was radiating blue, stronger and stronger every second. Orcs were getting closer. And these weren't just regular orcs either, Uruk-Hai were among them. Frodo had killed regular orcs before, but he had never stabbed an Uruk-Hai, not wit the blue stick."
 d4 = "Sam was carrying a small lamp, shedding some blue light. He was afraid that orcs might spot him, but it was the only way to avoid deadly pitfalls of Mordor."
 
 
@@ -34,7 +34,9 @@ def get_wordnet_pos(treebank_tag):
 
 def filter_nouns_adjectives(tokens):
     tagged = nltk.pos_tag(tokens)
-    return [t for t in tagged if (t[1][:1] == 'J' or t[1][:1] == 'N') and t[0] not in blacklist]
+    for t in tagged:
+        if (t[1][:1] == 'J' or t[1][:1] == 'N') and t[0] not in blacklist:
+            yield t
 
 
 def lemmatize(tokens):
