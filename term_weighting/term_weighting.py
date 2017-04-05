@@ -13,10 +13,10 @@ d2 = "The faceless black beast then stabbed Frodo. He felt like every nerve in h
 d3 = "Frodo's sword was radiating blue, stronger and stronger every second. Orcs were getting closer. And these weren't just regular orcs either, Uruk-Hai were among them. Frodo had killed regular orcs before, but he had never stabbed an Uruk-Hai, not wit the blue stick."
 d4 = "Sam was carrying a small lamp, shedding some blue light. He was afraid that orcs might spot him, but it was the only way to avoid deadly pitfalls of Mordor."
 
-
-blacklist = [
-
-]
+corrections = {
+    'orcs' : 'orc',
+    'only' : None,
+}
 
 # stolen from http://stackoverflow.com/questions/15586721/wordnet-lemmatization-and-pos-tagging-in-python
 def get_wordnet_pos(treebank_tag):
@@ -35,12 +35,24 @@ def get_wordnet_pos(treebank_tag):
 def filter_nouns_adjectives(tokens):
     tagged = nltk.pos_tag(tokens)
     for t in tagged:
-        if (t[1][:1] == 'J' or t[1][:1] == 'N') and t[0] not in blacklist:
+        if (t[1][:1] == 'J' or t[1][:1] == 'N'):
             yield t
 
 
 def lemmatize(tokens):
-    return [lemmatizer.lemmatize(t[0], get_wordnet_pos(t[1])) for t in tokens]
+    for t in tokens:
+        yield lemmatizer.lemmatize(t[0], get_wordnet_pos(t[1]))
+
+        
+def manual_correct(tokens):
+    for t in tokens:
+        try:
+            replacement = corrections[t]
+            if replacement:
+                yield replacement
+        except KeyError:
+            yield t
+
 
 def build_idf_map(docs):
     all_terms = set()
@@ -76,7 +88,8 @@ def preprocess(docs):
         tokens = nltk.word_tokenize(d)
         filtered_and_tagged = filter_nouns_adjectives(tokens)
         lemmatized = lemmatize(filtered_and_tagged)
-        res.append(lemmatized)
+        corrected = manual_correct(lemmatized)
+        res.append([t for t in corrected])
     return res
 
 
