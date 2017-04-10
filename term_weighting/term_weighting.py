@@ -13,6 +13,12 @@ d2 = "The faceless black beast then stabbed Frodo. He felt like every nerve in h
 d3 = "Frodo's sword was radiating blue, stronger and stronger every second. Orcs were getting closer. And these weren't just regular orcs either, Uruk-Hai were among them. Frodo had killed regular orcs before, but he had never stabbed an Uruk-Hai, not wit the blue stick."
 d4 = "Sam was carrying a small lamp, shedding some blue light. He was afraid that orcs might spot him, but it was the only way to avoid deadly pitfalls of Mordor."
 
+d1_rel = "Frodo Sam darkness surrounded darkness blood-thirsty orc. Sam certain beast scent flesh."
+d2_rel = "faceless black beast Frodo. nerve body Sam calming smile. Frodo."
+d3_rel = "Frodo sword radiating blue, stronger stronger second. Orc. regulsr orc, Uruk-Hai. Frodo regular orc Uruk-Haiblue stick."
+d4_rel = "Sam small lamp, blue light. afraid orc way deadly pitfalls Mordor."
+
+
 corrections = {
     'orcs' : 'orc',
     'only' : None,
@@ -41,9 +47,12 @@ def filter_nouns_adjectives(tokens):
 
 def lemmatize(tokens):
     for t in tokens:
-        yield lemmatizer.lemmatize(t[0], get_wordnet_pos(t[1]))
+        try:
+            yield lemmatizer.lemmatize(t[0], get_wordnet_pos(t[1]))
+        except KeyError:
+            pass
 
-        
+
 def manual_correct(tokens):
     for t in tokens:
         try:
@@ -82,11 +91,11 @@ def calc_tf_idf(tf, idf):
         vec[k] = v*idf[k]
     return vec
 
-def preprocess(docs):
+def preprocess(docs, filter=True):
     res = []
     for d in docs:
         tokens = nltk.word_tokenize(d)
-        filtered_and_tagged = filter_nouns_adjectives(tokens)
+        filtered_and_tagged = filter_nouns_adjectives(tokens) if filter else nltk.pos_tag(tokens)
         lemmatized = lemmatize(filtered_and_tagged)
         corrected = manual_correct(lemmatized)
         res.append([t for t in corrected])
@@ -97,7 +106,10 @@ def main():
 
     dlist = [d1.lower(), d2.lower(), d3.lower(), d4.lower()]
 
-    dlist = preprocess(dlist)
+    drlist = [d1_rel.lower(), d2_rel.lower(), d3_rel.lower(), d4_rel.lower()]
+
+    #dlist = preprocess(dlist)
+    dlist = preprocess(drlist, filter=False)
     print('Filtered and lemmatized:')
     i = 1
     for d in dlist:
