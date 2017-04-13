@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import nltk
+import math
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 from pprint import pprint
@@ -14,8 +15,8 @@ d3 = "Frodo's sword was radiating blue, stronger and stronger every second. Orcs
 d4 = "Sam was carrying a small lamp, shedding some blue light. He was afraid that orcs might spot him, but it was the only way to avoid deadly pitfalls of Mordor."
 
 d1_rel = "Frodo Sam darkness surrounded darkness blood-thirsty orc. Sam certain beast scent flesh."
-d2_rel = "faceless black beast Frodo. nerve body Sam calming smile. Frodo."
-d3_rel = "Frodo sword radiating blue, stronger stronger second. Orc. regulsr orc, Uruk-Hai. Frodo regular orc Uruk-Haiblue stick."
+d2_rel = "faceless black beast Frodo. nerve body. Sam calming smile. Frodo."
+d3_rel = "Frodo sword radiating blue, stronger stronger second. Orc closer. regular orc, Uruk-Hai. Frodo regular orc Uruk-Hai blue stick."
 d4_rel = "Sam small lamp, blue light. afraid orc way deadly pitfalls Mordor."
 
 
