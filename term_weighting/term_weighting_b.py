@@ -5,8 +5,6 @@ import math
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 from pprint import pprint
-from similarities import cosine, euclidean, norm_euclidean
-
 
 lemmatizer = WordNetLemmatizer()
 
@@ -22,6 +20,7 @@ d3_rel = "Frodo sword radiating blue, stronger stronger second. Orc closer. regu
 d4_rel = "Sam small lamp, blue light. afraid orc way deadly pitfalls Mordor."
 
 q= ['sam', 'blue', 'orc']
+
 
 corrections = {
     'orcs' : 'orc',
@@ -77,16 +76,19 @@ def build_idf_map(docs):
         occurences = 0
         for d in docs:
             occurences += 1 if term in d else 0
-        map[term] = len(docs)/occurences
+        map[term] = (len(docs) - occurences) / occurences
     return map
 
 def build_tf_map(doc):
     map = {}
+    max_term_freq = 0
+    for t in doc:
+        max_term_freq = doc.count(t) if doc.count(t) > max_term_freq else max_term_freq
     for t in doc:
         try:
             map[t]
         except KeyError:
-            map[t] = doc.count(t)
+            map[t] = (1 + math.log2(doc.count(t))) / (1 + math.log2(max_term_freq))
     return map
 
 def calc_tf_idf(tf, idf):
@@ -106,16 +108,15 @@ def preprocess(docs, filter=True):
     return res
 
 
-
 def main():
-
-    dlist = [d1.lower(), d2.lower(), d3.lower(), d4.lower()]
-
-    drlist = [d1_rel.lower(), d2_rel.lower(), d3_rel.lower(), d4_rel.lower()]
 
     query = {}
     for t in q:
         query[t] =1.0
+
+    dlist = [d1.lower(), d2.lower(), d3.lower(), d4.lower()]
+
+    drlist = [d1_rel.lower(), d2_rel.lower(), d3_rel.lower(), d4_rel.lower()]
 
     #dlist = preprocess(dlist)
     dlist = preprocess(drlist, filter=False)
@@ -137,14 +138,9 @@ def main():
         vector = calc_tf_idf(tf_map, idf_map)
         print('--doc%s--' % (str(i)))
         pprint(vector)
-        cos = cosine(query, vector)
-        print('Cosine similarity doc%s and query: %s' % (str(i), str(cos)))
-        euc = euclidean(query, vector)
-        print('Euclidean distance doc%s and query: %s' % (str(i), str(euc)))
-        norm_euc = norm_euclidean(query, vector)
-        print('Normalized euclidean distance doc%s and query: %s' % (str(i), str(norm_euc)))
+        sim = cosine(query, vector)
+        print('Cosine similarity doc%s and query: %s' % (str(i), str(sim)))
         i += 1
-
 
 
 
