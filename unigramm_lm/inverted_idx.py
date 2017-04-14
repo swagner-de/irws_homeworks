@@ -3,10 +3,10 @@ INTERPOLATION_FACTOR = 0.5
 
 class InvertedIdxDocEntry():
 
-    def __init__(self, doc_id, term, docs):
+    def __init__(self, doc_id, term, doc, doc_tokens):
         self.doc_id = doc_id
-        self.tf = docs[doc_id].count(term)
-        self.doc_tokens = len(docs[doc_id])
+        self.tf = doc.count(term)
+        self.doc_tokens = doc_tokens
 
     @property
     def unigram_model(self):
@@ -26,7 +26,7 @@ class InvertedIdx:
 
     def __init__(self):
         self.idx = {}
-        self.docs_indexed = []
+        self.doc_tokens = {}
         self.total_tokens = 0
 
     def __str__(self):
@@ -65,14 +65,14 @@ class InvertedIdx:
         :param doc_id: Document id that contains the term
         :param docs: The collection of all documents
         """
-        entry = InvertedIdxDocEntry(doc_id, term, docs)
+        if doc_id not in self.doc_tokens:
+            self.doc_tokens[doc_id] = len(docs[doc_id])
+            self.total_tokens += self.doc_tokens[doc_id]
+        entry = InvertedIdxDocEntry(doc_id, term, docs[doc_id], self.doc_tokens[doc_id])
         if term in self.idx:
             self.idx[term].add(entry)
         else:
             self.idx[term] = set([entry])
-        if entry.doc_id not in self.docs_indexed:
-            self.docs_indexed.append(entry.doc_id)
-            self.total_tokens += entry.doc_tokens
 
     def local_unigram(self, term, doc_id):
         """
