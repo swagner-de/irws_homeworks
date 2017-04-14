@@ -34,10 +34,10 @@ class InvertedIdx:
             rep += "'%s':\t%s\n" % (k, vals)
         return rep
 
-    def total_occurences(self, term):
+    def total_occurrences(self, term):
         """
-        :param term: the term for which the occurences shall be counted in the index
-        :return: the total number of occurences in all documents
+        :param term: the term for which the occurrences shall be counted in the index
+        :return: the total number of occurrences in all documents
         """
         occurences = 0
         try:
@@ -69,10 +69,11 @@ class InvertedIdx:
                 if doc.doc_id == doc_id:
                     return doc.unigramm_model
         except KeyError:
-            return 0
+            pass
+        return 0
 
     def global_unigramm(self, term):
-        return self.total_occurences(term) / self.total_tokens
+        return self.total_occurrences(term) / self.total_tokens
 
     def prefilter_docs(self, query_terms):
         relevant_docs = set()
@@ -84,11 +85,13 @@ class InvertedIdx:
                 pass
         return relevant_docs
 
+
 def build_local_unigram(doc_id, docs, inv_idx):
     unigramm = {}
     for term in set(docs[doc_id]):
         unigramm[term] = inv_idx.local_unigramm(term, doc_id)
     return unigramm
+
 
 def build_global_unigram(inv_idx):
     unigramm = {}
