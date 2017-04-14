@@ -8,6 +8,7 @@ from pprint import pprint
 from doc_selector import get_random_docs
 from preprocess import preprocess
 from inverted_idx import *
+from query import Query
 
 LOGGER = logging.getLogger()
 
@@ -34,8 +35,15 @@ def parse_args():
         dest='amount',
         required=True,
         help='amount of selected docs')
+    parser.add_argument(
+        '-q',
+        type=str,
+        nargs='?',
+        dest='query_terms',
+        required=True,
+        help='terms for query')
     args = parser.parse_args()
-    return args.files, args.amount
+    return args.files, args.amount, args.query_terms.lower()
 
 
 def init_logging(log_path):
@@ -49,20 +57,29 @@ def init_logging(log_path):
     LOGGER.addHandler(stream_handler)
 
 def main():
+    # initialize
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
-    path, amount = parse_args()
+    path, amount, query_terms = parse_args()
+
+    # load random docs in memory
     rand_docs = [doc for doc in get_random_docs(path, amount)]
+    # preprocess these docs
     docs = [preprocess(doc) for doc in rand_docs]
 
     inv_idx = InvertedIdx()
-    for idx in range(len(docs)-1):
-        for term in docs[idx]:
-            inv_idx.add_term(term, idx, docs)
+    inv_idx.build_idx_from_docs(docs)
+
+    print('Inverted index')
     print(inv_idx)
+    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 
     global_unigramm = build_global_unigram(inv_idx)
 
+    print('global unigramm model')
     pprint(global_unigramm)
+    print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
+
+    q = Query(query_terms.split(' '), docs, inv_idx)
 
 
 if __name__ == '__main__':

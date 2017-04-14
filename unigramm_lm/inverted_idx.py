@@ -27,8 +27,18 @@ class InvertedIdx:
         self.docs_indexed = []
         self.total_tokens = 0
 
+    def __str__(self):
+        rep = ''
+        for k, v in self.idx.items():
+            vals = '; '.join([str(i) for i in v])
+            rep += "'%s':\t%s\n" % (k, vals)
+        return rep
 
     def total_occurences(self, term):
+        """
+        :param term: the term for which the occurences shall be counted in the index
+        :return: the total number of occurences in all documents
+        """
         occurences = 0
         try:
             for doc in self.idx[term]:
@@ -36,6 +46,11 @@ class InvertedIdx:
             return occurences
         except KeyError:
             return 0
+
+    def build_idx_from_docs(self, docs):
+        for id in range(len(docs) - 1):
+            for term in docs[id]:
+                self.add_term(term, id, docs)
 
     def add_term(self, term, doc_id, docs):
         entry = InvertedIdxDocEntry(doc_id, term, docs)
@@ -59,13 +74,15 @@ class InvertedIdx:
     def global_unigramm(self, term):
         return self.total_occurences(term) / self.total_tokens
 
-    def __str__(self):
-        rep = ''
-        for k, v in self.idx.items():
-            vals = '; '.join([str(i) for i in v])
-            rep += "'%s':\t%s\n" % (k, vals)
-        return rep
-
+    def prefilter_docs(self, query_terms):
+        relevant_docs = set()
+        for term in query_terms:
+            try:
+                for entry in self.idx[term]:
+                    relevant_docs.add(entry.doc_id)
+            except KeyError:
+                pass
+        return relevant_docs
 
 def build_local_unigram(doc_id, docs, inv_idx):
     unigramm = {}
