@@ -50,11 +50,21 @@ class InvertedIdx:
             return 0
 
     def build_idx_from_docs(self, docs):
+        """
+        This will create the inverted idx from an document collection
+        :param docs: An array of arrays which represent tokenized docs
+        """
         for id in range(len(docs) - 1):
             for term in docs[id]:
                 self.add_term(term, id, docs)
 
     def add_term(self, term, doc_id, docs):
+        """
+        This will add a given term to the index
+        :param term: The term for which the index entry is added
+        :param doc_id: Document id that contains the term
+        :param docs: The collection of all documents
+        """
         entry = InvertedIdxDocEntry(doc_id, term, docs)
         if term in self.idx:
             self.idx[term].add(entry)
@@ -65,6 +75,12 @@ class InvertedIdx:
             self.total_tokens += entry.doc_tokens
 
     def local_unigram(self, term, doc_id):
+        """
+        This will return the unigram probabilistic model for a given term within a document
+        :param term: term for which the probability shall be returned
+        :param doc_id: document concerning
+        :return: the probability for term t in document t with Jelinek Mercer smoothing
+        """
         try:
             docs = self.idx[term]
             for doc in docs:
@@ -76,6 +92,10 @@ class InvertedIdx:
         return 0
 
     def global_unigram(self, term):
+        """
+        :param term: The term for which the probability is required
+        :return: Probability of term in the document collection (based on the index)
+        """
         return self.total_occurrences(term) / self.total_tokens
 
 

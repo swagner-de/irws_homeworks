@@ -20,6 +20,9 @@ class Query:
 
     @property
     def prefiltered_docs(self):
+        """
+        This will return the docs in the index that contain at least one query term
+        """
         relevant_docs = set()
         for term in self.query_terms:
             try:
@@ -30,11 +33,13 @@ class Query:
         return relevant_docs
 
     def doc_likelihood(self):
+        """
+        This will determine the document likelihood based on the local unigram model
+        """
         ranked = []
         for id in self.prefiltered_docs:
             res_doc = Result(id, 1)
             for term in self.query_terms:
-                if term in self.query_terms:
-                    res_doc.doc_likelihood *= self.inv_idx.local_unigram(term, id)
+                res_doc.doc_likelihood *= self.inv_idx.local_unigram(term, id)
             ranked.append(res_doc)
         return sorted(ranked, key=lambda x: x.doc_likelihood, reverse=True)
