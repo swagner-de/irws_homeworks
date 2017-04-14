@@ -6,6 +6,10 @@ class InvertedIdxDocEntry():
         self.tf = docs[doc_id].count(term)
         self.doc_tokens = len(docs[doc_id])
 
+    @property
+    def unigramm_model(self):
+        return self.tf/self.doc_tokens
+
     def __hash__(self):
         return self.doc_id
 
@@ -20,6 +24,18 @@ class InvertedIdx:
 
     def __init__(self):
         self.idx = {}
+        self.docs_indexed = []
+        self.total_tokens = 0
+
+
+    def total_occurences(self, term):
+        occurences = 0
+        try:
+            for doc in self.idx[term]:
+                occurences += doc.tf
+            return occurences
+        except KeyError:
+            return 0
 
     def add_term(self, term, doc_id, docs):
         entry = InvertedIdxDocEntry(doc_id, term, docs)
@@ -27,6 +43,21 @@ class InvertedIdx:
             self.idx[term].add(entry)
         else:
             self.idx[term] = set([entry])
+        if entry.doc_id not in self.docs_indexed:
+            self.docs_indexed.append(entry.doc_id)
+            self.total_tokens += entry.doc_tokens
+
+    def local_unigramm(self, term, doc_id):
+        try:
+            docs = self.idx[term]
+            for doc in docs:
+                if doc.doc_id == doc_id:
+                    return doc.unigramm_model
+        except KeyError:
+            return 0
+
+    def global_unigramm(self, term):
+        return self.total_occurences(term) / self.total_tokens
 
     def __str__(self):
         rep = ''
@@ -34,3 +65,16 @@ class InvertedIdx:
             vals = '; '.join([str(i) for i in v])
             rep += "'%s':\t%s\n" % (k, vals)
         return rep
+
+
+def build_local_unigram(doc_id, docs, inv_idx):
+    unigramm = {}
+    for term in set(docs[doc_id]):
+        unigramm[term] = inv_idx.local_unigramm(term, doc_id)
+    return unigramm
+
+def build_global_unigram(inv_idx):
+    unigramm = {}
+    for key in inv_idx.idx:
+        unigramm[key] = inv_idx.global_unigramm(key)
+    return unigramm

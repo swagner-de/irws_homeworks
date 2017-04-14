@@ -6,7 +6,7 @@ import argparse
 
 from pprint import pprint
 from doc_selector import get_random_docs
-from preporcess import preprocess
+from preprocess import preprocess
 from inverted_idx import *
 
 LOGGER = logging.getLogger()
@@ -59,6 +59,10 @@ def main():
         for term in docs[idx]:
             inv_idx.add_term(term, idx, docs)
     print(inv_idx)
+
+    global_unigramm = build_global_unigram(inv_idx)
+
+    pprint(global_unigramm)
 
 
 if __name__ == '__main__':
