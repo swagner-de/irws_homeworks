@@ -15,10 +15,12 @@ def select_random_docsid(amount, total_docs):
 
 
 def load_docs(doc_ids, filenames):
+    res = []
     for idx in doc_ids:
         with open(filenames[idx], mode='r', encoding='cp1252') as file:
-            yield file.read()
+            res.append(file.read())
             file.close()
+    return res
 
 
 def get_random_docs(folder, amount):

@@ -4,7 +4,6 @@ import os
 import logging
 import argparse
 
-from pprint import pprint
 from doc_selector import get_random_docs
 from preprocess import preprocess
 from inverted_idx import *
@@ -62,7 +61,7 @@ def main():
     path, amount, query_terms = parse_args()
 
     # load random docs in memory
-    rand_docs = [doc for doc in get_random_docs(path, amount)]
+    rand_docs = get_random_docs(path, amount)
     # preprocess these docs
     docs = [preprocess(doc) for doc in rand_docs]
 
