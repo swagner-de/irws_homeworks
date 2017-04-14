@@ -1,3 +1,5 @@
+INTERPOLATION_FACTOR = 0.5
+
 
 class InvertedIdxDocEntry():
 
@@ -7,7 +9,7 @@ class InvertedIdxDocEntry():
         self.doc_tokens = len(docs[doc_id])
 
     @property
-    def unigramm_model(self):
+    def unigram_model(self):
         return self.tf/self.doc_tokens
 
     def __hash__(self):
@@ -39,11 +41,11 @@ class InvertedIdx:
         :param term: the term for which the occurrences shall be counted in the index
         :return: the total number of occurrences in all documents
         """
-        occurences = 0
+        occurrences = 0
         try:
             for doc in self.idx[term]:
-                occurences += doc.tf
-            return occurences
+                occurrences += doc.tf
+            return occurrences
         except KeyError:
             return 0
 
@@ -62,39 +64,30 @@ class InvertedIdx:
             self.docs_indexed.append(entry.doc_id)
             self.total_tokens += entry.doc_tokens
 
-    def local_unigramm(self, term, doc_id):
+    def local_unigram(self, term, doc_id):
         try:
             docs = self.idx[term]
             for doc in docs:
                 if doc.doc_id == doc_id:
-                    return doc.unigramm_model
+                    return (INTERPOLATION_FACTOR * doc.unigram_model) +\
+                           ((1 - INTERPOLATION_FACTOR) * self.global_unigram(term))
         except KeyError:
             pass
         return 0
 
-    def global_unigramm(self, term):
+    def global_unigram(self, term):
         return self.total_occurrences(term) / self.total_tokens
-
-    def prefilter_docs(self, query_terms):
-        relevant_docs = set()
-        for term in query_terms:
-            try:
-                for entry in self.idx[term]:
-                    relevant_docs.add(entry.doc_id)
-            except KeyError:
-                pass
-        return relevant_docs
 
 
 def build_local_unigram(doc_id, docs, inv_idx):
-    unigramm = {}
+    unigram = {}
     for term in set(docs[doc_id]):
-        unigramm[term] = inv_idx.local_unigramm(term, doc_id)
-    return unigramm
+        unigram[term] = inv_idx.local_unigram(term, doc_id)
+    return unigram
 
 
 def build_global_unigram(inv_idx):
-    unigramm = {}
+    unigram = {}
     for key in inv_idx.idx:
-        unigramm[key] = inv_idx.global_unigramm(key)
-    return unigramm
+        unigram[key] = inv_idx.global_unigram(key)
+    return unigram

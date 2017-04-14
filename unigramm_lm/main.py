@@ -73,13 +73,20 @@ def main():
     print(inv_idx)
     print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 
-    global_unigramm = build_global_unigram(inv_idx)
+    #global_unigram = build_global_unigram(inv_idx)
 
-    print('global unigramm model')
-    pprint(global_unigramm)
+    #print('global unigramm model')
+    #pprint(global_unigram)
     print('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 
     q = Query(query_terms.split(' '), docs, inv_idx)
+
+    print(q)
+    relevant_docs = q.prefiltered_docs
+    print('Relevant docs by idx lookup: ' + ', '.join([str(id) for id in relevant_docs]))
+    ranked = q.doc_likelihood()
+
+    print('\n'.join([str(r) for r in ranked[:10]]))
 
 
 if __name__ == '__main__':
