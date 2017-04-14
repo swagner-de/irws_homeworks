@@ -9,7 +9,7 @@ def get_all_filenames_rec(folder):
 
 def select_random_docsid(amount, total_docs):
     random_docs_id = set()
-    while len(random_docs_id) <= amount:
+    while len(random_docs_id) < amount:
         random_docs_id.add(randint(0, total_docs-1))
     return random_docs_id
 
