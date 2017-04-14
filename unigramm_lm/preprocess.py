@@ -1,13 +1,14 @@
+import string
 import nltk
-#from nltk.corpus import stopwords
-from nltk.tokenize import RegexpTokenizer
+from nltk.corpus import stopwords
+from nltk.tokenize import TreebankWordTokenizer
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 
 
-TOKENIZER = RegexpTokenizer(r'\w+')
+TOKENIZER = TreebankWordTokenizer()
 LEMMATIZER = WordNetLemmatizer()
-#STOP = stopwords.words('english')
+STOP = stopwords.words('english')
 
 
 # stolen from http://stackoverflow.com/questions/15586721/wordnet-lemmatization-and-pos-tagging-in-python
@@ -25,14 +26,17 @@ def get_wordnet_pos(treebank_tag):
 
 
 def tokenize(doc):
+    doc = " ".join("".join([" " if ch in string.punctuation else ch for ch in doc]).split())
     for token in TOKENIZER.tokenize(doc):
         yield token.lower()
 
 
 def remove_stopwords(tokens):
+    res = []
     for token in tokens:
         if token not in STOP:
-            yield token
+            res.append(token)
+    return res
 
 
 def lemmatize(tokens):
@@ -45,6 +49,6 @@ def lemmatize(tokens):
 
 def preprocess(doc):
     tokens = tokenize(doc)
-    #tokens = remove_stopwords(tokenized)
-    return [doc for doc in lemmatize([token for token in tokens])]
+    tokens = remove_stopwords(tokens)
+    return tokens
 
