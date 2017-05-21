@@ -32,14 +32,16 @@ def cosine(doc1, doc2):
     scalar = 0
     ldoc1 = 0
     ldoc2 = 0
-    for term in set().union(*[doc1, doc2]):
-        d1 = doc1.get(term, 0)
-        d2 = doc2.get(term, 0)
-        ldoc1 += math.pow(d1, 2)
-        ldoc2 += math.pow(d2, 2)
-        scalar += d1 * d2
+
+    if len(doc1) != len(doc2):
+        raise ValueError('Vector sizes differ')
+
+    for i in range(len(doc1)):
+        ldoc1 += math.pow(doc1[i], 2)
+        ldoc2 += math.pow(doc2[i], 2)
+        scalar += doc1[i] * doc2[i]
     ldoc1, ldoc2 = math.sqrt(ldoc1), math.sqrt(ldoc2)
-    return scalar/ (ldoc1 + ldoc2)
+    return scalar/ (ldoc1 * ldoc2)
 
 
 def rank(query, docs):

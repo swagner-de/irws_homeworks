@@ -13,14 +13,22 @@ def load_emebeddings(folder):
                 w2v[line.split()[0]] = line.split()[1:]
     return w2v
 
+# derive a vector by multiplying the tfidf with every line of the embeddingg vector
+# then sum all embedding vectors together
+# then divide by the sum of the length of all embedding vectors
 def compute_embedding_vec(embeddings, doc_tfidf):
     intersect = set(doc_tfidf.keys()).intersection(embeddings.keys())
-    res = {}
+    res = []
+    divisor = 0
     for term in intersect:
-        divisor = 0
-        a = 0
         _tfidf = doc_tfidf[term]
         divisor += _tfidf
-        a += sum([float(_tfidf) * float(emb) for emb in embeddings[term]])
-        res[term] = a / divisor
+        emb_vec = embeddings[term]
+        for emb in range(len(emb_vec)):
+            try:
+                res[emb] += _tfidf * float(emb_vec[emb])
+            except IndexError:
+                res.append(_tfidf * float(emb_vec[emb]))
+    for k in res:
+        k /= divisor
     return res
